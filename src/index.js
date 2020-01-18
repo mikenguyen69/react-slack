@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import App from './components/App';
 import Login from './components/Auth/Login';
 import Register from './components/Auth/Register';
+import Spinner from './Spinner';
 import * as serviceWorker from './serviceWorker';
 import {BrowserRouter as Router, Switch, Route, withRouter } from 'react-router-dom';
 import firebase from './firebase';
@@ -20,6 +21,7 @@ const store = createStore(rootReducer, composeWithDevTools());
 class Root extends Component {
 
     componentDidMount() {
+        console.log(this.props.isLoading);
         firebase.auth().onAuthStateChanged(user => {
             if (user) {
                 this.props.setUser(user);
@@ -29,7 +31,7 @@ class Root extends Component {
     }
 
     render() {
-        return(
+        return this.props.isLoading ? <Spinner/> : (
             <Switch>
                 <Route exact path="/" component={App} />
                 <Route path="/login" component={Login} />
@@ -39,7 +41,11 @@ class Root extends Component {
     }
 }
 
-const RootWithAuth = withRouter(connect(null, {setUser})(Root));
+const mapStateToProps = state => ({
+    isLoading: state.user.isLoading
+})
+
+const RootWithAuth = withRouter(connect(mapStateToProps, {setUser})(Root));
 
 ReactDOM.render(
     <Provider store={store}>
