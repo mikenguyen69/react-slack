@@ -8,6 +8,12 @@ import {BrowserRouter as Router, Switch, Route, withRouter } from 'react-router-
 import firebase from './firebase';
 import 'semantic-ui-css/semantic.min.css';
 
+import {createStore} from 'redux';
+import {Provider} from 'react-redux';
+import {composeWithDevTool} from 'redux-devtools-extension';
+
+const store = createStore(() => {}, composeWithDevTool());
+
 class Root extends Component {
 
     componentDidMount() {
@@ -32,7 +38,10 @@ class Root extends Component {
 const RootWithAuth = withRouter(Root);
 
 ReactDOM.render(
-<Router>
-    <RootWithAuth />
-</Router>, document.getElementById('root'));
+    <Provider store={store}>
+        <Router>
+            <RootWithAuth />
+        </Router>
+    </Provider>
+, document.getElementById('root'));
 serviceWorker.register();
