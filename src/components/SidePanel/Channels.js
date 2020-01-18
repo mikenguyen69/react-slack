@@ -13,6 +13,20 @@ class Channels extends Component {
         user: this.props.currentUser
     };
 
+    componentDidMount() {
+        this.addListeners();
+    }
+
+    addListeners = () => {
+        let loadedChannels = [];
+
+        this.state.channelsRef.on('child_added', snap => {
+            loadedChannels.push(snap.val());
+            
+            this.setState({channels: loadedChannels});
+        });
+    }
+
     addChannel = () => {
         const { channelsRef, channelName, channelDetails, user} = this.state;
 
@@ -41,6 +55,17 @@ class Channels extends Component {
 
     }
 
+    displayChannels = channels => 
+        channels.length > 0 && 
+        channels.map( channel => (
+            <Menu.Item 
+                key={channel.id}
+                onClick={() => console.log(channel)} 
+                name={channel.name} style={{opacity: 0.7}}>
+                # {channel.name}
+            </Menu.Item>
+        ));
+
     handleChange = event => {
         this.setState({[event.target.name]: event.target.value });
     }
@@ -60,7 +85,7 @@ class Channels extends Component {
     isFormValid = ({channelName, channelDetails}) => channelName && channelDetails;
 
     render() {
-
+        const {channels, modal} = this.state;
         return(
             <React.Fragment>
                 <Menu.Menu style={{paddingBottom: '2em'}}> 
@@ -68,11 +93,12 @@ class Channels extends Component {
                         <span>
                             <Icon name="exchange" /> CHANNELS 
                         </span>{' '}
-                        ({ this.state.channels.length})  <Icon name='add' onClick={this.openModal}/>
+                        ({ channels.length})  <Icon name='add' onClick={this.openModal}/>
                     </Menu.Item>
+                    {this.displayChannels(channels)}
                 </Menu.Menu>
 
-                <Modal basic open={this.state.modal} onClose={this.closeModal}> 
+                <Modal basic open={modal} onClose={this.closeModal}> 
                     <Modal.Header>Add a channel</Modal.Header>
                     <Modal.Content>
                         <Form onSubmit={this.handleSubmit}>
